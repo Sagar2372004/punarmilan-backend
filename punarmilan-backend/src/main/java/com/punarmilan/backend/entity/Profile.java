@@ -5,6 +5,8 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "profiles")
@@ -40,6 +42,20 @@ public class Profile {
 
     private String maritalStatus;
     private String motherTongue;
+    
+    // ✅ FIXED: Change from primitive boolean to Boolean wrapper class
+    @Column(name = "is_premium")
+    @Builder.Default
+    private Boolean isPremium = false; // Changed to Boolean
+    
+    @Column(name = "hobbies", length = 500)
+    private String hobbies;
+    
+    @ElementCollection
+    @CollectionTable(name = "profile_photos", joinColumns = @JoinColumn(name = "profile_id"))
+    @Column(name = "photo_url")
+    @Builder.Default
+    private List<String> photos = new ArrayList<>();
     
     // ================= PROFILE PHOTOS =================
     @Column(name = "profile_photo_url")
@@ -123,7 +139,9 @@ public class Profile {
     private String profileCreatedBy;   // Self / Parents
     private String profileVisibility;  // Public / Private
 
-    private boolean profileComplete = false;
+    // ✅ FIXED: Change from primitive boolean to Boolean wrapper class
+    @Builder.Default
+    private Boolean profileComplete = false; // Changed to Boolean
 
     // ================= AUDIT =================
     private LocalDateTime createdAt;
@@ -140,6 +158,56 @@ public class Profile {
     // ================= HELPER METHODS =================
     public boolean isVerified() {
         return verificationStatus == VerificationStatus.VERIFIED;
+    }
+
+    // ✅ ADD getter for photos
+    public List<String> getPhotos() {
+        return photos != null ? photos : new ArrayList<>();
+    }
+    
+    // ✅ ADD getter for Profile Complete status (if missing)
+    public boolean isProfileComplete() {
+        return profileComplete != null ? profileComplete : false;
+    }
+    
+    // ✅ ADD getter for Education Level (if missing)
+    public String getEducationLevel() {
+        return educationLevel;
+    }
+    
+    // ✅ ADD getter for Occupation (if missing)
+    public String getOccupation() {
+        return occupation;
+    }
+    
+    // ✅ ADD getter for Religion (if missing)
+    public String getReligion() {
+        return religion;
+    }
+    
+    // ✅ ADD getter for Caste (if missing)
+    public String getCaste() {
+        return caste;
+    }
+    
+    // ✅ ADD getter for isPremium with null check
+    public boolean isPremium() {
+        return isPremium != null ? isPremium : false;
+    }
+    
+    // ✅ ADD getter for Height as Integer (for matching)
+    public Integer getHeight() {
+        if (height != null && height.contains("'")) {
+            try {
+                String[] parts = height.split("'");
+                int feet = Integer.parseInt(parts[0]);
+                int inches = parts.length > 1 ? Integer.parseInt(parts[1].replace("\"", "")) : 0;
+                return (feet * 12 + inches); // Height in inches
+            } catch (NumberFormatException e) {
+                return null;
+            }
+        }
+        return null;
     }
 
     // ================= JPA CALLBACKS =================

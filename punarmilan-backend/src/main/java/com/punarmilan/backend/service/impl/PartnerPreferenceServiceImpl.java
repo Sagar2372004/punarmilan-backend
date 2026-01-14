@@ -99,7 +99,8 @@ public class PartnerPreferenceServiceImpl implements PartnerPreferenceService {
         // Age match (15 points)
         if (preference.getMinAge() != null && preference.getMaxAge() != null) {
             maxPossibleScore += 15;
-            if (profile.getAge() >= preference.getMinAge() && 
+            if (profile.getAge() != null && 
+                profile.getAge() >= preference.getMinAge() && 
                 profile.getAge() <= preference.getMaxAge()) {
                 totalScore += 15;
                 criteriaMatches.put("age", true);
@@ -110,7 +111,8 @@ public class PartnerPreferenceServiceImpl implements PartnerPreferenceService {
         // Height match (10 points)
         if (preference.getMinHeight() != null && preference.getMaxHeight() != null) {
             maxPossibleScore += 10;
-            if (isHeightInRange(profile.getHeight(), preference.getMinHeight(), preference.getMaxHeight())) {
+            if (profile.getHeight() != null && 
+                isHeightInRange(profile.getHeight(), preference.getMinHeight(), preference.getMaxHeight())) {
                 totalScore += 10;
                 criteriaMatches.put("height", true);
                 matchReasons.add("Height matches your preference");
@@ -120,7 +122,8 @@ public class PartnerPreferenceServiceImpl implements PartnerPreferenceService {
         // Religion match (20 points)
         if (preference.getPreferredReligion() != null) {
             maxPossibleScore += 20;
-            if (preference.getPreferredReligion().equalsIgnoreCase(profile.getReligion())) {
+            if (profile.getReligion() != null && 
+                preference.getPreferredReligion().equalsIgnoreCase(profile.getReligion())) {
                 totalScore += 20;
                 criteriaMatches.put("religion", true);
                 matchReasons.add("Religion matches");
@@ -130,7 +133,8 @@ public class PartnerPreferenceServiceImpl implements PartnerPreferenceService {
         // Location match (15 points)
         if (preference.getPreferredCity() != null) {
             maxPossibleScore += 15;
-            if (preference.getPreferredCity().equalsIgnoreCase(profile.getCity())) {
+            if (profile.getCity() != null && 
+                preference.getPreferredCity().equalsIgnoreCase(profile.getCity())) {
                 totalScore += 15;
                 criteriaMatches.put("location", true);
                 matchReasons.add("Same city preference");
@@ -140,7 +144,8 @@ public class PartnerPreferenceServiceImpl implements PartnerPreferenceService {
         // Education match (15 points)
         if (preference.getMinEducationLevel() != null) {
             maxPossibleScore += 15;
-            if (isEducationLevelSufficient(profile.getEducationLevel(), preference.getMinEducationLevel())) {
+            if (profile.getEducationLevel() != null && 
+                isEducationLevelSufficient(profile.getEducationLevel(), preference.getMinEducationLevel())) {
                 totalScore += 15;
                 criteriaMatches.put("education", true);
                 matchReasons.add("Education level meets criteria");
@@ -151,7 +156,8 @@ public class PartnerPreferenceServiceImpl implements PartnerPreferenceService {
         if (preference.getPreferredDiet() != null && 
             !preference.getPreferredDiet().equals("No Preference")) {
             maxPossibleScore += 15;
-            if (preference.getPreferredDiet().equalsIgnoreCase(profile.getDiet())) {
+            if (profile.getDiet() != null && 
+                preference.getPreferredDiet().equalsIgnoreCase(profile.getDiet())) {
                 totalScore += 15;
                 criteriaMatches.put("lifestyle", true);
                 matchReasons.add("Diet preference matches");
@@ -162,7 +168,8 @@ public class PartnerPreferenceServiceImpl implements PartnerPreferenceService {
         if (preference.getMaritalStatus() != null && 
             !preference.getMaritalStatus().equals("No Preference")) {
             maxPossibleScore += 10;
-            if (preference.getMaritalStatus().equalsIgnoreCase(profile.getMaritalStatus())) {
+            if (profile.getMaritalStatus() != null && 
+                preference.getMaritalStatus().equalsIgnoreCase(profile.getMaritalStatus())) {
                 totalScore += 10;
                 criteriaMatches.put("marital", true);
                 matchReasons.add("Marital status matches");
@@ -298,6 +305,7 @@ public class PartnerPreferenceServiceImpl implements PartnerPreferenceService {
                            preference.getPreferredReligion().equals(p.getReligion()))
                 .collect(Collectors.toList());
     }
+    
     private int getThreshold(PartnerPreference preference) {
         return preference.getMatchScoreThreshold() != null ? 
                preference.getMatchScoreThreshold() : 60;
@@ -372,32 +380,56 @@ public class PartnerPreferenceServiceImpl implements PartnerPreferenceService {
                 .build();
     }
 
-    private boolean isHeightInRange(String height, String minHeight, String maxHeight) {
-        // Simple implementation - you can enhance this
-        if (height == null || minHeight == null || maxHeight == null) return true;
+    /**
+     * Fixed method to handle height comparison when profile height is Integer (inches)
+     * and preference heights are String (format like "5'8\"")
+     */
+    private boolean isHeightInRange(Integer heightInches, String minHeightStr, String maxHeightStr) {
+        // Handle null cases
+        if (heightInches == null || minHeightStr == null || maxHeightStr == null) {
+            return true; // If any value is null, consider it a match
+        }
+        
         try {
-            // Convert height strings to comparable values (e.g., inches)
-            double heightIn = convertHeightToInches(height);
-            double minHeightIn = convertHeightToInches(minHeight);
-            double maxHeightIn = convertHeightToInches(maxHeight);
-            return heightIn >= minHeightIn && heightIn <= maxHeightIn;
+            // Convert preference height strings to inches
+            double minHeightInches = convertHeightToInches(minHeightStr);
+            double maxHeightInches = convertHeightToInches(maxHeightStr);
+            
+            // Compare integer height with converted values
+            return heightInches >= minHeightInches && heightInches <= maxHeightInches;
         } catch (Exception e) {
+            log.warn("Error comparing heights: profileHeight={}, min={}, max={}", 
+                    heightInches, minHeightStr, maxHeightStr, e);
             return false;
         }
     }
     
     private double convertHeightToInches(String height) {
         // Convert "5'8\"" to inches: 5*12 + 8 = 68
-        if (height == null) return 0;
+        if (height == null || height.trim().isEmpty()) {
+            return 0;
+        }
+        
         try {
-            String[] parts = height.replace("\"", "").split("'");
+            // Remove quotes and split by feet symbol
+            String cleanHeight = height.replace("\"", "").trim();
+            String[] parts = cleanHeight.split("'");
+            
             if (parts.length == 2) {
                 int feet = Integer.parseInt(parts[0].trim());
-                int inches = Integer.parseInt(parts[1].trim());
+                int inches = parts[1].trim().isEmpty() ? 0 : Integer.parseInt(parts[1].trim());
                 return feet * 12 + inches;
+            } else if (parts.length == 1) {
+                // Handle case where only feet are provided (e.g., "5'")
+                int feet = Integer.parseInt(parts[0].trim());
+                return feet * 12;
             }
             return 0;
+        } catch (NumberFormatException e) {
+            log.warn("Invalid height format: {}", height);
+            return 0;
         } catch (Exception e) {
+            log.warn("Error converting height: {}", height, e);
             return 0;
         }
     }

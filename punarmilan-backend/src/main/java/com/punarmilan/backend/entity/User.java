@@ -5,7 +5,6 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
-
 @Entity
 @Table(name = "users")
 @Getter
@@ -30,18 +29,20 @@ public class User {
 
     @Column(nullable = false)
     @Builder.Default
-    private String role = "USER"; // ✅ DEFAULT value
+    private String role = "USER";
 
-    @Column(nullable = false)
+    @Column(name = "is_active", nullable = false)
     @Builder.Default
-    private boolean isActive = true;
+    private boolean active = true; // Changed from isActive to active
 
-    @Column(nullable = false)
+    @Column(name = "is_verified", nullable = false)
     @Builder.Default
-    private boolean isVerified = false;
+    private boolean verified = false; // Changed from isVerified to verified
+
+    @Column(name = "last_login")
+    private LocalDateTime lastLogin;
 
     private LocalDateTime createdAt;
-
     private LocalDateTime updatedAt;
 
     @PrePersist
@@ -55,4 +56,3 @@ public class User {
         updatedAt = LocalDateTime.now();
     }
 }
-

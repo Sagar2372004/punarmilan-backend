@@ -16,7 +16,7 @@ public class ProfileResponseDto {
     private String fullName;
     private String gender;
     private Integer age;
-    private String height;
+    private Integer height;
     private Double weight;
     private String maritalStatus;
     private String motherTongue;
@@ -44,7 +44,7 @@ public class ProfileResponseDto {
     private LocalDateTime verifiedAt;
     private String verifiedBy;
     private String verificationNotes;
-    private boolean verified;
+    private Boolean verified; // ✅ Changed to Boolean
 
     // ================= EDUCATION & CAREER =================
     private String educationLevel;
@@ -72,7 +72,8 @@ public class ProfileResponseDto {
     // ================= SETTINGS =================
     private String profileCreatedBy;
     private String profileVisibility;
-    private boolean profileComplete;
+    private Boolean profileComplete; // ✅ Changed to Boolean
+    private Boolean isPremium; // ✅ Add this field
 
     // ================= AUDIT =================
     private LocalDateTime createdAt;

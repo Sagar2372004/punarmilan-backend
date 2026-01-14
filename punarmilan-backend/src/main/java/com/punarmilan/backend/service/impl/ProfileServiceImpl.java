@@ -461,7 +461,7 @@ public class ProfileServiceImpl implements ProfileService {
         }
     }
 
-    // 🔁 ENTITY → RESPONSE DTO
+ // In ProfileServiceImpl.java, update the mapToResponse method:
     private ProfileResponseDto mapToResponse(Profile profile) {
         return ProfileResponseDto.builder()
                 .id(profile.getId())
@@ -493,7 +493,8 @@ public class ProfileServiceImpl implements ProfileService {
                 .aboutMe(profile.getAboutMe())
                 .profileCreatedBy(profile.getProfileCreatedBy())
                 .profileVisibility(profile.getProfileVisibility())
-                .profileComplete(profile.isProfileComplete())
+                .profileComplete(profile.getProfileComplete()) // ✅ Use getter
+                .isPremium(profile.isPremium()) // ✅ Add this line
                 .createdAt(profile.getCreatedAt())
                 .updatedAt(profile.getUpdatedAt())
                 // Photos

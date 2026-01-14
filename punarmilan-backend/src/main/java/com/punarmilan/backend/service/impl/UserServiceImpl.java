@@ -50,8 +50,8 @@ public class UserServiceImpl implements UserService {
                 .password(passwordEncoder.encode(request.getPassword()))
                 .mobileNumber(request.getMobileNumber())
                 .role("USER")
-                .isActive(true)
-                .isVerified(false)
+                .active(true)
+                .verified(false)
                 .build();
 
         User savedUser = userRepository.save(user);
