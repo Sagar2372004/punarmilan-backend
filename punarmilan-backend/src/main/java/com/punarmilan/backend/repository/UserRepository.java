@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -16,30 +18,40 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findByEmail(String email);
 
+    Optional<User> findByProfileId(String profileId);
+
     boolean existsByEmail(String email);
 
     List<User> findByRole(String role);
 
+    Page<User> findByRole(String role, Pageable pageable);
+
     void deleteByEmail(String email);
-    
+
+    List<User> findByCreatedAtAfter(LocalDateTime date);
+
     // ✅ FIXED: Use 'active' (field name) not 'isActive'
     List<User> findByCreatedAtAfterAndActiveTrue(LocalDateTime date);
-    
+
     // ✅ FIXED: Use 'active' (field name) not 'isActive'
     List<User> findByLastLoginAfterAndActiveTrue(LocalDateTime date);
-    
+
     // ✅ FIXED: Use 'active' (field name) not 'isActive'
     List<User> findByActiveTrue();
-    
+
     // ✅ FIXED: Use 'u.active' (field name) not 'u.isActive'
     @Query("SELECT u FROM User u WHERE u.active = true AND u.id != :userId")
     List<User> findActiveUsersExcept(@Param("userId") Long userId);
-    
+
     // ✅ FIXED: Use 'u.active' (field name) not 'u.isActive'
     @Query("SELECT u FROM User u WHERE u.active = true AND u.createdAt >= :date")
     List<User> findNewUsersSince(@Param("date") LocalDateTime date);
-    
+
     // ✅ FIXED: Use 'u.active' (field name) not 'u.isActive'
-    @Query("SELECT u FROM User u WHERE u.active = true AND u.lastLogin >= :date")
+    @Query("SELECT u FROM User u WHERE u.lastLogin >= :date")
     List<User> findActiveUsersSince(@Param("date") LocalDateTime date);
+
+    List<User> findByRoleNot(String role);
+
+    Page<User> findByRoleNot(String role, Pageable pageable);
 }

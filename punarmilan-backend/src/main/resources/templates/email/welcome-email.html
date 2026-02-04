@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Welcome to Punar Milan</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background-color: #2196F3;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .content {
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #777;
+            font-size: 12px;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #2196F3;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Welcome to Punar Milan!</h1>
+        </div>
+        <div class="content">
+            <p>Hello <span th:text="${username}"></span>,</p>
+
+            <p>Welcome to Punar Milan - your journey to meaningful connections begins here!</p>
+
+            <p>We're excited to have you join our community. Here's what you can do:</p>
+
+            <ul>
+                <li>Complete your profile to get better matches</li>
+                <li>Browse profiles and find meaningful connections</li>
+                <li>Send connection requests to people you like</li>
+                <li>Chat with your connections in real-time</li>
+            </ul>
+
+            <h2 style="color: #2c3e50; text-align: center; margin-bottom: 20px;">
+                Welcome to the Family, <span style="color: #667eea;" th:text="${firstName}">User</span>!
+            </h2>
+
+            <p style="text-align: center; margin: 30px 0;">
+                <a th:href="${frontendUrl + '/complete-profile'}" class="button">
+                    Complete Your Profile
+                </a>
+            </p>
+
+            <p>Need help getting started? Check out our <a th:href="${frontendUrl + '/help'}">help center</a>.</p>
+
+            <p>Best regards,<br>The Punar Milan Team</p>
+        </div>
+        <div class="footer">
+            <p>© 2024 Punar Milan. All rights reserved.</p>
+            <p>This email was sent to <span th:text="${user.email}"></span></p>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -23,6 +23,7 @@ public class PartnerPreferenceResponseDto {
     private String smokingHabit;
     private String maritalStatus;
     private String occupation;
+    private String workingWith;
     private String minAnnualIncome;
     private Boolean preferWorkingProfessional;
     private Boolean preferNri;

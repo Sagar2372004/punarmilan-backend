@@ -24,4 +24,6 @@ public class MatchResultDto {
         private Integer totalMatches;
         private Integer totalCriteria;
     }
+ // Add userId to access user information
+    private Long userId;
 }

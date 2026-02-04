@@ -19,7 +19,6 @@ public class WebConfig implements WebMvcConfigurer {
     
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        // Windows मध्ये file: prefix सोबत path
         String uploadPath = "file:" + uploadDir + "/";
         
         log.info("Configuring static resources from: {}", uploadPath);
@@ -33,10 +32,21 @@ public class WebConfig implements WebMvcConfigurer {
     
     @Override
     public void addCorsMappings(CorsRegistry registry) {
+        String[] origins = allowedOrigins.split(",");
+        
         registry.addMapping("/**")
-                .allowedOrigins(allowedOrigins.split(","))
-                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                .allowedOrigins(origins)
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
                 .allowedHeaders("*")
-                .allowCredentials(true);
+                .allowCredentials(true)
+                .maxAge(3600);
+        
+        // Add WebSocket specific CORS
+        registry.addMapping("/ws/**")
+                .allowedOrigins(origins)
+                .allowedMethods("*")
+                .allowedHeaders("*")
+                .allowCredentials(true)
+                .maxAge(3600);
     }
 }

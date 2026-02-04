@@ -1,33 +1,64 @@
-HELP.md
-target/
-.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
+# ===============================
+# Maven / Build
+# ===============================
+/target/
+/bin/
+build/
 
-### STS ###
-.apt_generated
+# ===============================
+# Runtime Data
+# ===============================
+/uploads/
+
+# ===============================
+# Environment Secrets
+# ===============================
+.env
+application-prod.properties
+
+# ===============================
+# Logs
+# ===============================
+*.log
+
+# ===============================
+# Eclipse / STS
+# ===============================
 .classpath
-.factorypath
 .project
-.settings
+.settings/
 .springBeans
 .sts4-cache
 
-### IntelliJ IDEA ###
-.idea
+# ===============================
+# IntelliJ
+# ===============================
+.idea/
 *.iws
 *.iml
 *.ipr
 
-### NetBeans ###
+# ===============================
+# VS Code
+# ===============================
+.vscode/
+
+# ===============================
+# NetBeans
+# ===============================
 /nbproject/private/
 /nbbuild/
 /dist/
 /nbdist/
 /.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
 
-### VS Code ###
-.vscode/
+# ===============================
+# OS Files
+# ===============================
+.DS_Store
+Thumbs.db
+
+# ===============================
+# Java Compiled
+# ===============================
+*.class

@@ -18,27 +18,27 @@ public class ConnectionResponseDto {
 
     private Long id;
     private Long requestId;
-    
+
     // Sender info
     private SenderInfo sender;
-    private String senderProfilePhoto;
-    
+    private PhotoDto senderProfilePhoto;
+
     // Receiver info
     private ReceiverInfo receiver;
-    private String receiverProfilePhoto;
-    
+    private PhotoDto receiverProfilePhoto;
+
     private String status; // PENDING, ACCEPTED, REJECTED, WITHDRAWN
     private String message;
     private boolean read;
-    
+
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime sentAt;
-    
+
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime respondedAt;
-    
+
     private String responseMessage;
-    
+
     // Helper flags for UI
     private boolean canWithdraw;
     private boolean canAccept;
@@ -46,9 +46,9 @@ public class ConnectionResponseDto {
     private boolean isBlocked;
     private Integer matchScore;
     private String matchPercentage;
-    
+
     // ==================== INNER CLASSES ====================
-    
+
     @Data
     @Builder
     @NoArgsConstructor
@@ -57,7 +57,7 @@ public class ConnectionResponseDto {
         private boolean accept;
         private String responseMessage;
     }
-    
+
     @Data
     @Builder
     @NoArgsConstructor
@@ -69,12 +69,14 @@ public class ConnectionResponseDto {
         private String gender;
         private Integer age;
         private String city;
-        private String profilePhotoUrl;
+        private PhotoDto profilePhotoUrl;
         private boolean isVerified;
         private String occupation;
         private String education;
+        private String rashi;
+        private String manglikStatus;
     }
-    
+
     @Data
     @Builder
     @NoArgsConstructor
@@ -86,12 +88,14 @@ public class ConnectionResponseDto {
         private String gender;
         private Integer age;
         private String city;
-        private String profilePhotoUrl;
+        private PhotoDto profilePhotoUrl;
         private boolean isVerified;
         private String occupation;
         private String education;
+        private String rashi;
+        private String manglikStatus;
     }
-    
+
     // Add UserBasicDto as separate class
     @Data
     @Builder
@@ -104,7 +108,9 @@ public class ConnectionResponseDto {
         private String gender;
         private Integer age;
         private String city;
-        private String profilePhotoUrl;
+        private PhotoDto profilePhotoUrl;
         private boolean isVerified;
+        private String rashi;
+        private String manglikStatus;
     }
 }

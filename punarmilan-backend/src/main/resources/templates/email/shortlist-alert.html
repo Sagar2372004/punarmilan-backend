@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Someone Shortlisted You!</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f7f6;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            background: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #6e8efb, #a777e3);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 15px 30px;
+            background-color: #6e8efb;
+            color: white !important;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+
+        .footer {
+            text-align: center;
+            color: #888;
+            font-size: 12px;
+            padding: 20px;
+            background: #f9f9f9;
+        }
+
+        .profile-bubble {
+            background: #f0f2f5;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 5px solid #6e8efb;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Exciting News!</h1>
+            <p>Somebody is interested in your profile</p>
+        </div>
+        <div class="content">
+            <p>Hi,</p>
+            <p>Great news! <strong><span th:text="${senderName}">User</span></strong> has shortlisted your profile on
+                Punar Milan.</p>
+
+            <div class="profile-bubble">
+                <p>They liked what they saw! This is a great opportunity to connect and start a conversation.</p>
+            </div>
+
+            <p>Don't keep them waiting. View their profile and express your interest back!</p>
+
+            <div style="text-align: center;">
+                <a th:href="${profileUrl}" class="button">View Profile</a>
+            </div>
+        </div>
+        <div class="footer">
+            <p>&copy; 2026 Punar Milan. All rights reserved.</p>
+            <p>You received this because you are a registered member of Punar Milan.</p>
+            <p><a th:href="${frontendUrl + '/settings/notifications'}">Manage notification settings</a></p>
+        </div>
+    </div>
+</body>
+
+</html>

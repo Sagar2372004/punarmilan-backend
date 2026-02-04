@@ -13,7 +13,9 @@ import com.punarmilan.backend.repository.ConnectionRequestRepository;
 import com.punarmilan.backend.repository.ProfileRepository;
 import com.punarmilan.backend.repository.UserRepository;
 import com.punarmilan.backend.service.ConnectionService;
+import com.punarmilan.backend.service.EmailService;
 import com.punarmilan.backend.service.NotificationService;
+import com.punarmilan.backend.service.PhotoVisibilityService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -26,10 +28,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -42,6 +42,9 @@ public class ConnectionServiceImpl implements ConnectionService {
     private final UserRepository userRepository;
     private final ProfileRepository profileRepository;
     private final NotificationService notificationService;
+    private final EmailService emailService;
+    private final PhotoVisibilityService photoVisibilityService;
+    private final com.punarmilan.backend.repository.MatchRepository matchRepository;
 
     @Override
     public ConnectionResponseDto sendConnectionRequest(ConnectionRequestDto requestDto) {
@@ -51,6 +54,12 @@ public class ConnectionServiceImpl implements ConnectionService {
 
         // Validations
         validateConnectionRequest(currentUser, receiver);
+
+        // Check if sender is hidden
+        if (currentUser.isHidden()) {
+            throw new BadRequestException(
+                    "You cannot send connection requests while your profile is hidden. Unhide it first.");
+        }
 
         // Check if user is blocked
         if (isUserBlockedBy(currentUser, receiver)) {
@@ -94,8 +103,10 @@ public class ConnectionServiceImpl implements ConnectionService {
                 "New Connection Request",
                 String.format("%s wants to connect with you", getUserDisplayName(currentUser)),
                 savedRequest.getId(),
-                "CONNECTION_REQUEST"
-        );
+                "CONNECTION_REQUEST");
+
+        // Send email notification to receiver
+        emailService.sendConnectionRequestEmail(currentUser, receiver);
 
         return mapToResponseDto(savedRequest);
     }
@@ -134,8 +145,7 @@ public class ConnectionServiceImpl implements ConnectionService {
                     "Connection Request Accepted",
                     String.format("%s accepted your connection request", getUserDisplayName(currentUser)),
                     request.getId(),
-                    "CONNECTION_REQUEST"
-            );
+                    "CONNECTION_REQUEST");
 
             log.info("Connection request {} accepted", requestId);
         } else {
@@ -149,8 +159,7 @@ public class ConnectionServiceImpl implements ConnectionService {
                     "Connection Request Declined",
                     String.format("%s declined your connection request", getUserDisplayName(currentUser)),
                     request.getId(),
-                    "CONNECTION_REQUEST"
-            );
+                    "CONNECTION_REQUEST");
 
             log.info("Connection request {} rejected", requestId);
         }
@@ -200,7 +209,7 @@ public class ConnectionServiceImpl implements ConnectionService {
                 .findBySenderAndReceiver(currentUser, userToBlock)
                 .map(cr -> cr.getStatus() == ConnectionRequest.Status.BLOCKED)
                 .orElse(false);
-        
+
         if (alreadyBlocked) {
             throw new BadRequestException("User is already blocked");
         }
@@ -264,20 +273,20 @@ public class ConnectionServiceImpl implements ConnectionService {
     @Override
     public Page<UserBasicDto> getBlockedUsers(Pageable pageable) {
         User currentUser = getCurrentUser();
-        
+
         // Get all requests where current user is sender and status is BLOCKED
         List<ConnectionRequest> blockedRequests = connectionRequestRepository.findAll().stream()
                 .filter(request -> request.getSender().getId().equals(currentUser.getId()))
                 .filter(request -> request.getStatus() == ConnectionRequest.Status.BLOCKED)
                 .collect(Collectors.toList());
-        
+
         // Map to UserBasicDto
         List<UserBasicDto> blockedUsers = blockedRequests.stream()
                 .map(request -> {
                     User blockedUser = request.getReceiver();
                     Profile profile = profileRepository.findByUser(blockedUser)
                             .orElse(new Profile());
-                    
+
                     return UserBasicDto.builder()
                             .id(blockedUser.getId())
                             .email(blockedUser.getEmail())
@@ -285,17 +294,17 @@ public class ConnectionServiceImpl implements ConnectionService {
                             .gender(profile.getGender())
                             .age(profile.getAge())
                             .city(profile.getCity())
-                            .profilePhotoUrl(profile.getProfilePhotoUrl())
+                            .profilePhotoUrl(photoVisibilityService.getProfilePhoto(currentUser, blockedUser))
                             .isVerified(profile.isVerified())
                             .build();
                 })
                 .collect(Collectors.toList());
-        
+
         // Apply pagination
         int start = (int) pageable.getOffset();
         int end = Math.min((start + pageable.getPageSize()), blockedUsers.size());
         List<UserBasicDto> paginatedList = blockedUsers.subList(start, end);
-        
+
         return new PageImpl<>(paginatedList, pageable, blockedUsers.size());
     }
 
@@ -304,7 +313,7 @@ public class ConnectionServiceImpl implements ConnectionService {
         User currentUser = getCurrentUser();
         User otherUser = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-        
+
         // Check if current user is blocked by other user
         return isUserBlockedBy(otherUser, currentUser);
     }
@@ -345,7 +354,7 @@ public class ConnectionServiceImpl implements ConnectionService {
 
         // Verify current user is either sender or receiver
         if (!request.getSender().getId().equals(currentUser.getId()) &&
-            !request.getReceiver().getId().equals(currentUser.getId())) {
+                !request.getReceiver().getId().equals(currentUser.getId())) {
             throw new BadRequestException("You are not authorized to view this request");
         }
 
@@ -423,12 +432,12 @@ public class ConnectionServiceImpl implements ConnectionService {
         try {
             User receiver = userRepository.findById(receiverId)
                     .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-            
+
             // Check if user is blocked
             if (isUserBlockedBy(currentUser, receiver) || isUserBlockedBy(receiver, currentUser)) {
                 return false;
             }
-            
+
             validateConnectionRequest(currentUser, receiver);
             return true;
         } catch (BadRequestException | ResourceNotFoundException e) {
@@ -465,13 +474,12 @@ public class ConnectionServiceImpl implements ConnectionService {
         // Find mutual connections
         List<ConnectionResponseDto> mutualConnections = new ArrayList<>();
         for (ConnectionRequest connection : myConnections) {
-            User connectedUser = connection.getSender().getId().equals(currentUser.getId()) ?
-                    connection.getReceiver() : connection.getSender();
+            User connectedUser = connection.getSender().getId().equals(currentUser.getId()) ? connection.getReceiver()
+                    : connection.getSender();
 
             // Check if this user is also connected to targetUser
             boolean isMutual = targetConnections.stream()
-                    .anyMatch(targetConnection ->
-                            targetConnection.getSender().getId().equals(connectedUser.getId()) ||
+                    .anyMatch(targetConnection -> targetConnection.getSender().getId().equals(connectedUser.getId()) ||
                             targetConnection.getReceiver().getId().equals(connectedUser.getId()));
 
             if (isMutual) {
@@ -565,11 +573,11 @@ public class ConnectionServiceImpl implements ConnectionService {
         User currentUser = getCurrentUser();
         boolean isSender = request.getSender().getId().equals(currentUser.getId());
         boolean isReceiver = request.getReceiver().getId().equals(currentUser.getId());
-        
+
         // Check if user is blocked
         boolean isBlocked = request.getStatus() == ConnectionRequest.Status.BLOCKED;
 
-        return ConnectionResponseDto.builder()
+        ConnectionResponseDto response = ConnectionResponseDto.builder()
                 .id(request.getId())
                 .requestId(request.getId())
                 .sender(ConnectionResponseDto.SenderInfo.builder()
@@ -579,12 +587,12 @@ public class ConnectionServiceImpl implements ConnectionService {
                         .gender(senderProfile.getGender())
                         .age(senderProfile.getAge())
                         .city(senderProfile.getCity())
-                        .profilePhotoUrl(senderProfile.getProfilePhotoUrl())
+                        .profilePhotoUrl(photoVisibilityService.getProfilePhoto(currentUser, request.getSender()))
                         .isVerified(senderProfile.isVerified())
                         .occupation(senderProfile.getOccupation())
                         .education(senderProfile.getEducationLevel())
                         .build())
-                .senderProfilePhoto(senderProfile.getProfilePhotoUrl())
+                .senderProfilePhoto(photoVisibilityService.getProfilePhoto(currentUser, request.getSender()))
                 .receiver(ConnectionResponseDto.ReceiverInfo.builder()
                         .id(request.getReceiver().getId())
                         .email(request.getReceiver().getEmail())
@@ -592,12 +600,12 @@ public class ConnectionServiceImpl implements ConnectionService {
                         .gender(receiverProfile.getGender())
                         .age(receiverProfile.getAge())
                         .city(receiverProfile.getCity())
-                        .profilePhotoUrl(receiverProfile.getProfilePhotoUrl())
+                        .profilePhotoUrl(photoVisibilityService.getProfilePhoto(currentUser, request.getReceiver()))
                         .isVerified(receiverProfile.isVerified())
                         .occupation(receiverProfile.getOccupation())
                         .education(receiverProfile.getEducationLevel())
                         .build())
-                .receiverProfilePhoto(receiverProfile.getProfilePhotoUrl())
+                .receiverProfilePhoto(photoVisibilityService.getProfilePhoto(currentUser, request.getReceiver()))
                 .status(request.getStatus().name())
                 .message(request.getMessage())
                 .read(request.isRead())
@@ -609,5 +617,66 @@ public class ConnectionServiceImpl implements ConnectionService {
                 .canReject(isReceiver && request.getStatus() == ConnectionRequest.Status.PENDING)
                 .isBlocked(isBlocked)
                 .build();
+
+        // ✅ Apply Astro Visibility Filtering
+        applyAstroPrivacy(currentUser, senderProfile, response.getSender());
+        applyAstroPrivacy(currentUser, receiverProfile, response.getReceiver());
+
+        return response;
+    }
+
+    private void applyAstroPrivacy(User viewer, Profile ownerProfile, Object info) {
+        if (viewer.getId().equals(ownerProfile.getUser().getId())) {
+            setAstroInfo(ownerProfile, info);
+            return;
+        }
+
+        // Admin override
+        if (viewer.getRole() != null && viewer.getRole().equalsIgnoreCase("ROLE_ADMIN")) {
+            setAstroInfo(ownerProfile, info);
+            return;
+        }
+
+        com.punarmilan.backend.entity.enums.AstroVisibility visibility = ownerProfile.getAstroVisibility();
+        if (visibility == null)
+            visibility = com.punarmilan.backend.entity.enums.AstroVisibility.ALL_MEMBERS;
+
+        boolean canSee = false;
+        if (visibility == com.punarmilan.backend.entity.enums.AstroVisibility.ALL_MEMBERS) {
+            canSee = true;
+        } else if (visibility == com.punarmilan.backend.entity.enums.AstroVisibility.CONTACTED_AND_ACCEPTED) {
+            User owner = ownerProfile.getUser();
+            boolean matched = matchRepository.areUsersMatched(viewer, owner);
+            boolean connected = connectionRequestRepository.areUsersConnected(viewer, owner);
+            canSee = matched || connected;
+        }
+
+        if (canSee) {
+            setAstroInfo(ownerProfile, info);
+        } else {
+            clearAstroInfo(info);
+        }
+    }
+
+    private void setAstroInfo(Profile profile, Object info) {
+        if (info instanceof ConnectionResponseDto.SenderInfo) {
+            ((ConnectionResponseDto.SenderInfo) info).setRashi(profile.getRashi());
+            ((ConnectionResponseDto.SenderInfo) info).setManglikStatus(
+                    profile.getManglikStatus() != null ? profile.getManglikStatus().name() : null);
+        } else if (info instanceof ConnectionResponseDto.ReceiverInfo) {
+            ((ConnectionResponseDto.ReceiverInfo) info).setRashi(profile.getRashi());
+            ((ConnectionResponseDto.ReceiverInfo) info).setManglikStatus(
+                    profile.getManglikStatus() != null ? profile.getManglikStatus().name() : null);
+        }
+    }
+
+    private void clearAstroInfo(Object info) {
+        if (info instanceof ConnectionResponseDto.SenderInfo) {
+            ((ConnectionResponseDto.SenderInfo) info).setRashi(null);
+            ((ConnectionResponseDto.SenderInfo) info).setManglikStatus(null);
+        } else if (info instanceof ConnectionResponseDto.ReceiverInfo) {
+            ((ConnectionResponseDto.ReceiverInfo) info).setRashi(null);
+            ((ConnectionResponseDto.ReceiverInfo) info).setManglikStatus(null);
+        }
     }
 }

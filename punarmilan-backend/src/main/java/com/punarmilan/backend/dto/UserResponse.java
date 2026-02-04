@@ -14,9 +14,15 @@ public class UserResponse {
     private Long id;
     private String email;
     private String mobileNumber;
+    private String profileId;
     private String role;
-    private boolean isActive;
-    private boolean isVerified;
+    private Boolean isActive; // Changed from boolean to Boolean
+    private Boolean isVerified; // Changed from boolean to Boolean
+    private Boolean isPremium; // Added this field
+    private Boolean isHidden;
+    private LocalDateTime hiddenUntil;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private LocalDateTime lastLogin;
+    private LocalDateTime premiumSince; // Added this field
 }

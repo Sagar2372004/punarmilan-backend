@@ -26,10 +26,9 @@ public class CustomUserDetailsService implements UserDetailsService {
                 .orElseThrow(() ->
                         new UsernameNotFoundException("User not found with email: " + email));
 
-        // ✅ FIX: ROLE_ prefix ADD करा
         String roleWithPrefix = "ROLE_" + user.getRole().toUpperCase();
-        
-        List<SimpleGrantedAuthority> authorities = 
+
+        List<SimpleGrantedAuthority> authorities =
             Collections.singletonList(new SimpleGrantedAuthority(roleWithPrefix));
 
         return new org.springframework.security.core.userdetails.User(

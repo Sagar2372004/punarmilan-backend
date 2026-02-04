@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verification Status Update | Punar Milan</title>
+    <style>
+        /* Similar styling as other templates - truncated for brevity */
+    </style>
+</head>
+
+<body>
+    <div class="email-container">
+        <div class="header">
+            <div class="logo">Punar Milan</div>
+            <h1 th:if="${approved}">✅ Profile Verified!</h1>
+            <h1 th:unless="${approved}">❌ Verification Rejected</h1>
+        </div>
+
+        <div class="content">
+            <h2 th:if="${approved}" style="color: #28a745;">
+                Congratulations, <span th:text="${firstName}">User</span>!
+            </h2>
+            <h2 th:unless="${approved}" style="color: #e74c3c;">
+                Verification Update
+            </h2>
+
+            <div th:if="${approved}" class="verified-badge">
+                <span>✓</span>
+                <h3>Verified Profile Badge Awarded</h3>
+            </div>
+
+            <div th:unless="${approved}" class="rejected-notice">
+                <p><strong>Reason:</strong> <span th:text="${reason}">Document unclear</span></p>
+            </div>
+
+            <!-- Rest of the template similar to others -->
+        </div>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Featured Profile of the Day</title>
+    <style>
+        body {
+            font-family: 'Outfit', 'Segoe UI', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            background-color: #0f172a;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 40px auto;
+            background: #ffffff;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #6366f1, #a855f7);
+            color: white;
+            padding: 50px 20px;
+            text-align: center;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .featured-card {
+            border: 2px solid #e2e8f0;
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            background: #f8fafc;
+        }
+
+        .profile-img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 5px solid white;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            background: #ec4899;
+            color: white;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .button {
+            display: block;
+            width: 100%;
+            margin-top: 30px;
+            padding: 18px;
+            background: linear-gradient(to right, #6366f1, #a855f7);
+            color: white !important;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: bold;
+            text-align: center;
+            font-size: 18px;
+        }
+
+        .footer {
+            text-align: center;
+            color: #94a3b8;
+            font-size: 12px;
+            padding: 30px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <span class="badge">HANDPICKED FOR YOU</span>
+            <h1>Featured Spotlight</h1>
+            <p>Don't miss out on this amazing profile</p>
+        </div>
+        <div class="content">
+            <div class="featured-card">
+                <img th:src="${profile.profilePhotoUrl ?: 'https://via.placeholder.com/150'}" class="profile-img"
+                    alt="Featured Profile">
+                <h2 style="margin: 15px 0 5px;" th:text="${profile.fullName}">Full Name</h2>
+                <p style="color: #6366f1; font-weight: 500;" th:text="${profile.occupation}">Software Architect</p>
+                <div style="margin: 20px 0; color: #64748b;">
+                    <span th:text="${profile.age}">28</span> yrs •
+                    <span th:text="${profile.city}">Mumbai</span> •
+                    <span th:text="${profile.religion}">Hindu</span>
+                </div>
+                <p style="font-style: italic; color: #475569;" th:text="${profile.aboutMe}">"I am looking for a
+                    companion who shares my passion for travel and technology..."</p>
+            </div>
+
+            <a th:href="${frontendUrl + '/profile/' + profile.user.id}" class="button">Connect with <span
+                    th:text="${profile.fullName.split(' ')[0]}">them</span></a>
+        </div>
+        <div class="footer">
+            <p>&copy; 2026 Punar Milan. Helping you find your perfect match.</p>
+            <p>This is a featured broadcast from Punar Milan Team.</p>
+        </div>
+    </div>
+</body>
+
+</html>

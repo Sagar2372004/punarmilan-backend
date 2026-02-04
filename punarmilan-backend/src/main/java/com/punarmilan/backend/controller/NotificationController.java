@@ -30,7 +30,7 @@ public class NotificationController {
     public ResponseEntity<Page<NotificationDto>> getNotifications(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
-        
+
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
         Page<NotificationDto> notifications = notificationService.getNotifications(pageable);
         return ResponseEntity.ok(notifications);
@@ -78,32 +78,54 @@ public class NotificationController {
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(summary = "Get notification preferences")
+    @GetMapping("/preferences")
+    public ResponseEntity<com.punarmilan.backend.dto.NotificationPreferenceDto> getPreferences() {
+        return ResponseEntity.ok(notificationService.getPreferences());
+    }
+
+    @Operation(summary = "Update notification preferences")
+    @PutMapping("/preferences")
+    public ResponseEntity<com.punarmilan.backend.dto.NotificationPreferenceDto> updatePreferences(
+            @RequestBody com.punarmilan.backend.dto.NotificationPreferenceDto dto) {
+        return ResponseEntity.ok(notificationService.updatePreferences(dto));
+    }
+
     // Comment out unimplemented methods for now
     /*
-    @Operation(summary = "Get notifications by type")
-    @GetMapping("/type/{type}")
-    public ResponseEntity<Page<NotificationDto>> getNotificationsByType(
-            @PathVariable String type,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size) {
-        
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-        Page<NotificationDto> notifications = notificationService.getNotificationsByType(type, pageable);
-        return ResponseEntity.ok(notifications);
-    }
-
-    @Operation(summary = "Get recent notifications (last 7 days)")
-    @GetMapping("/recent")
-    public ResponseEntity<List<NotificationDto>> getRecentNotifications() {
-        List<NotificationDto> notifications = notificationService.getRecentNotifications(7);
-        return ResponseEntity.ok(notifications);
-    }
-
-    @Operation(summary = "Clear all notifications")
-    @DeleteMapping("/clear-all")
-    public ResponseEntity<Void> clearAllNotifications() {
-        notificationService.clearAllNotifications();
-        return ResponseEntity.noContent().build();
-    }
-    */
+     * @Operation(summary = "Get notifications by type")
+     * 
+     * @GetMapping("/type/{type}")
+     * public ResponseEntity<Page<NotificationDto>> getNotificationsByType(
+     * 
+     * @PathVariable String type,
+     * 
+     * @RequestParam(defaultValue = "0") int page,
+     * 
+     * @RequestParam(defaultValue = "20") int size) {
+     * 
+     * Pageable pageable = PageRequest.of(page, size,
+     * Sort.by("createdAt").descending());
+     * Page<NotificationDto> notifications =
+     * notificationService.getNotificationsByType(type, pageable);
+     * return ResponseEntity.ok(notifications);
+     * }
+     * 
+     * @Operation(summary = "Get recent notifications (last 7 days)")
+     * 
+     * @GetMapping("/recent")
+     * public ResponseEntity<List<NotificationDto>> getRecentNotifications() {
+     * List<NotificationDto> notifications =
+     * notificationService.getRecentNotifications(7);
+     * return ResponseEntity.ok(notifications);
+     * }
+     * 
+     * @Operation(summary = "Clear all notifications")
+     * 
+     * @DeleteMapping("/clear-all")
+     * public ResponseEntity<Void> clearAllNotifications() {
+     * notificationService.clearAllNotifications();
+     * return ResponseEntity.noContent().build();
+     * }
+     */
 }

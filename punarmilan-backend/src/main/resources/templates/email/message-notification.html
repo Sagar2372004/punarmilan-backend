@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Message Received | Punar Milan</title>
+    <style>
+        /* Base Styles */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            background-color: #f7f9fc;
+        }
+
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        .logo {
+            color: white;
+            font-size: 28px;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .message-card {
+            background-color: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin: 30px 0;
+            border: 2px solid #e9ecef;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .sender-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .sender-avatar {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .sender-avatar span {
+            font-size: 30px;
+            color: white;
+        }
+
+        .message-content {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .message-content::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-bottom: 10px solid #f8f9fa;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 14px 32px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            margin: 20px 0;
+            transition: transform 0.3s ease;
+        }
+
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.2);
+        }
+
+        .quick-reply {
+            background-color: #f0f7ff;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 30px 0;
+        }
+
+        .quick-reply-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+
+        .quick-reply-button {
+            padding: 8px 16px;
+            background-color: white;
+            border: 1px solid #667eea;
+            color: #667eea;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .quick-reply-button:hover {
+            background-color: #667eea;
+            color: white;
+        }
+
+        .conversation-stats {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            margin: 30px 0;
+            text-align: center;
+        }
+
+        .stat-item {
+            padding: 15px;
+        }
+
+        .message-time {
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 14px;
+            margin: 10px 0;
+        }
+
+        .footer {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: 30px;
+            text-align: center;
+        }
+
+        @media (max-width: 600px) {
+            .content {
+                padding: 20px;
+            }
+
+            .sender-info {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .quick-reply-buttons {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="email-container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">Punar Milan</div>
+            <h1 style="color: white; margin: 0; font-size: 28px;">
+                New Message Received 💬
+            </h1>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <h2 style="color: #2c3e50; text-align: center; margin-bottom: 20px;">
+                Hello <span style="color: #667eea;" th:text="${receiver.firstName}">User</span>!
+            </h2>
+
+            <p style="text-align: center; color: #7f8c8d; font-size: 18px;">
+                You've received a new message from
+                <strong th:text="${sender.firstName + ' ' + sender.lastName}">John Doe</strong>
+            </p>
+
+            <!-- Message Card -->
+            <div class="message-card">
+                <!-- Sender Info -->
+                <div class="sender-info">
+                    <div class="sender-avatar">
+                        <span th:if="${sender.gender == 'MALE'}">👨</span>
+                        <span th:if="${sender.gender == 'FEMALE'}">👩</span>
+                        <span th:if="${sender.gender != 'MALE' and sender.gender != 'FEMALE'}">👤</span>
+                    </div>
+                    <div>
+                        <h3 style="margin: 0 0 5px 0; color: #2c3e50;">
+                            <span th:text="${sender.firstName + ' ' + sender.lastName}">John Doe</span>
+                            <span th:if="${sender.verified}" style="color: #28a745; font-size: 16px;">✓</span>
+                        </h3>
+                        <p style="margin: 0; color: #7f8c8d; font-size: 14px;">
+                            <span th:text="${sender.age}">30</span> •
+                            <span th:text="${sender.profession}">Software Engineer</span> •
+                            <span th:text="${sender.city}">Pune</span>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Message Time -->
+                <div class="message-time">
+                    📅 <span th:text="${messageDate}">01 Jan 2024</span>
+                    at <span th:text="${messageTime}">2:30 PM</span>
+                </div>
+
+                <!-- Message Content -->
+                <div class="message-content">
+                    <p style="margin: 0; color: #2c3e50; line-height: 1.8;">
+                        <span th:text="${message.content}">Hello! I saw your profile and we have so much in common.
+                            Would love to connect and get to know you better!</span>
+                    </p>
+                </div>
+
+                <!-- Message Preview (if longer) -->
+                <div th:if="${#strings.length(message.content) > 200}" style="text-align: center; margin: 15px 0;">
+                    <p style="color: #7f8c8d; font-size: 14px; margin: 0;">
+                        Message truncated. Click below to read full message.
+                    </p>
+                </div>
+            </div>
+
+            <!-- CTA Button -->
+            <div style="text-align: center; margin: 30px 0;">
+                <a th:href="${frontendUrl + '/messages/' + sender.id}" class="button">
+                    💬 Reply to Message →
+                </a>
+            </div>
+
+            <!-- Quick Reply Options -->
+            <div class="quick-reply">
+                <h4 style="color: #2c3e50; margin-top: 0;">🚀 Quick Reply</h4>
+                <p style="color: #7f8c8d; margin: 10px 0; font-size: 14px;">
+                    Send a quick response with one click:
+                </p>
+                <div class="quick-reply-buttons">
+                    <a th:href="${frontendUrl + '/messages/' + sender.id + '?quickReply=Hi! Thanks for your message.'}"
+                        class="quick-reply-button">
+                        👋 Hi! Thanks for your message
+                    </a>
+                    <a th:href="${frontendUrl + '/messages/' + sender.id + '?quickReply=I\'d love to connect and learn more about you.'}"
+                        class="quick-reply-button">
+                        😊 I'd love to connect
+                    </a>
+                    <a th:href="${frontendUrl + '/messages/' + sender.id + '?quickReply=Could you tell me more about yourself?'}"
+                        class="quick-reply-button">
+                        🤔 Tell me more about yourself
+                    </a>
+                </div>
+            </div>
+
+            <!-- Conversation Stats -->
+            <div class="conversation-stats">
+                <div class="stat-item">
+                    <div style="font-size: 20px; font-weight: 700; color: #667eea;">
+                        <span th:text="${messageCount}">5</span>
+                    </div>
+                    <div style="color: #7f8c8d; font-size: 14px;">Total Messages</div>
+                </div>
+                <div class="stat-item">
+                    <div style="font-size: 20px; font-weight: 700; color: #667eea;">
+                        <span th:text="${unreadCount}">2</span>
+                    </div>
+                    <div style="color: #7f8c8d; font-size: 14px;">Unread Messages</div>
+                </div>
+                <div class="stat-item">
+                    <div style="font-size: 20px; font-weight: 700; color: #667eea;">
+                        <span th:text="${compatibilityPercentage}">85</span>%
+                    </div>
+                    <div style="color: #7f8c8d; font-size: 14px;">Compatibility</div>
+                </div>
+            </div>
+
+            <!-- Premium Features -->
+            <div style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); 
+                        color: white; border-radius: 12px; padding: 25px; margin: 30px 0; 
+                        text-align: center;">
+                <h4 style="margin: 0 0 15px 0; color: white;">✨ Unlock Premium Messaging</h4>
+                <p style="margin: 0 0 15px 0; opacity: 0.9;">
+                    Upgrade to Premium for unlimited messages, read receipts, and priority support
+                </p>
+                <a th:href="${frontendUrl + '/upgrade'}" style="display: inline-block; padding: 10px 25px; 
+                          background-color: white; color: #4facfe; 
+                          text-decoration: none; border-radius: 50px; 
+                          font-weight: 600;">
+                    Upgrade Now
+                </a>
+            </div>
+
+            <!-- Conversation Tips -->
+            <div style="background-color: #f8f9fa; border-radius: 8px; padding: 20px; margin: 30px 0;">
+                <h4 style="color: #2c3e50; margin-top: 0;">💡 Conversation Tips</h4>
+                <div
+                    style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 15px;">
+                    <div>
+                        <strong style="color: #667eea; display: block; margin-bottom: 5px;">Ask Questions</strong>
+                        <p style="color: #7f8c8d; margin: 0; font-size: 14px;">
+                            Show interest by asking about their hobbies, work, or interests
+                        </p>
+                    </div>
+                    <div>
+                        <strong style="color: #667eea; display: block; margin-bottom: 5px;">Be Authentic</strong>
+                        <p style="color: #7f8c8d; margin: 0; font-size: 14px;">
+                            Be yourself and share genuine thoughts and experiences
+                        </p>
+                    </div>
+                    <div>
+                        <strong style="color: #667eea; display: block; margin-bottom: 5px;">Respect Boundaries</strong>
+                        <p style="color: #7f8c8d; margin: 0; font-size: 14px;">
+                            Take time to build trust and respect personal boundaries
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- View All Conversations -->
+            <div style="text-align: center; margin-top: 40px;">
+                <p style="color: #7f8c8d; margin-bottom: 15px;">
+                    View all your conversations:
+                </p>
+                <a th:href="${frontendUrl + '/messages'}" style="color: #667eea; text-decoration: none; font-weight: 600; 
+                          border: 2px solid #667eea; padding: 10px 25px; 
+                          border-radius: 50px; display: inline-block;">
+                    View All Messages
+                </a>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p style="margin: 0 0 20px 0; font-size: 14px;">
+                This message was sent to you by
+                <span th:text="${sender.firstName + ' ' + sender.lastName}">John Doe</span>
+                via Punar Milan messaging system.
+            </p>
+
+            <div style="margin-bottom: 20px;">
+                <a th:href="${frontendUrl + '/privacy'}"
+                    style="color: #ecf0f1; text-decoration: none; margin: 0 10px;">Privacy</a>
+                <a th:href="${frontendUrl + '/block-user'}"
+                    style="color: #ecf0f1; text-decoration: none; margin: 0 10px;">Block User</a>
+                <a th:href="${frontendUrl + '/report'}"
+                    style="color: #ecf0f1; text-decoration: none; margin: 0 10px;">Report</a>
+                <a th:href="${frontendUrl + '/help/messaging'}"
+                    style="color: #ecf0f1; text-decoration: none; margin: 0 10px;">Help</a>
+            </div>
+
+            <p style="font-size: 12px; color: #bdc3c7; margin: 0 0 10px 0;">
+                Manage your messaging notifications in
+                <a th:href="${frontendUrl + '/account/notifications'}" style="color: #ecf0f1;">account settings</a>
+            </p>
+
+            <p style="font-size: 11px; color: #95a5a6; margin: 0;">
+                © 2024 Punar Milan. Pune, Maharashtra, India.<br>
+                Keep the conversation meaningful and respectful
+            </p>
+        </div>
+    </div>
+</body>
+
+</html>

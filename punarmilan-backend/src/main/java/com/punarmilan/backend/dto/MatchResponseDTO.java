@@ -16,19 +16,19 @@ import java.util.List;
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class MatchResponseDTO {
-    
+
     // Match information
     private Long matchId;
     private Long userId;
     private boolean isLiked;
     private boolean isMatched;
     private boolean isViewed;
-    
+
     // User information
-    private UserBasicDto user;  // ✅ Use UserBasicDto here
-    private List<String> photos;
-    private String primaryPhoto;
-    
+    private UserBasicDto user; // ✅ Use UserBasicDto here
+    private List<PhotoDto> photos;
+    private PhotoDto primaryPhoto;
+
     // Stats (duplicate from user for easy access)
     private Integer age;
     private String city;
@@ -37,42 +37,42 @@ public class MatchResponseDTO {
     private String height;
     private String religion;
     private String caste;
-    
+
     // Compatibility
     private Integer compatibilityScore;
     private String compatibilityPercentage;
     private List<String> commonInterests;
-    
+
     // Status indicators
     private boolean isOnline;
     private boolean isVerified;
     private boolean isPremium;
     private LocalDateTime lastActive;
-    
+
     // Distance
     private Double distanceKm;
     private String distanceText;
-    
+
     // Actions
     private boolean canLike;
     private boolean canChat;
     private boolean canViewProfile;
     private boolean canBlock;
-    
+
     // Timestamps
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;
-    
+
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime matchedAt;
-    
+
     // For "Near Me" category
     private GeoLocationDTO location;
-    
+
     // For "Today's" category
     private boolean isNewToday;
     private boolean isRecentlyActive;
-    
+
     // Inner classes
     @Data
     @Builder
@@ -83,7 +83,7 @@ public class MatchResponseDTO {
         private Double longitude;
         private String address;
     }
-    
+
     @Data
     @Builder
     @NoArgsConstructor
@@ -99,7 +99,7 @@ public class MatchResponseDTO {
         private boolean hasNext;
         private boolean hasPrevious;
     }
-    
+
     @Data
     @Builder
     @NoArgsConstructor
@@ -113,7 +113,7 @@ public class MatchResponseDTO {
         private Integer totalMatches;
         private Integer unviewedMatches;
         private Integer mutualLikes;
-        
+
         @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
         private LocalDateTime lastUpdated;
     }

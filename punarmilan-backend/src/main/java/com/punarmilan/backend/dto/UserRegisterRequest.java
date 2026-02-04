@@ -7,16 +7,21 @@ import lombok.Data;
 
 @Data
 public class UserRegisterRequest {
-	@Email(message=" invalid email format ")
-	@NotBlank(message ="email is required ")
+	@Email(message = " invalid email format ")
+	@NotBlank(message = "email is required ")
 	private String email;
-	
-	@NotBlank(message ="password is required")
+
+	@NotBlank(message = "password is required")
 	@Size(min = 6, message = "Password must be at least 6 characters")
 	private String password;
-	
-	@NotBlank(message="mobileNumber is required")
+
+	@NotBlank(message = "mobileNumber is required")
 	private String mobileNumber;
-	 
+
+	@Data
+	public static class EmailUpdateRequest {
+		@NotBlank(message = "New email is required")
+		@Email(message = "Invalid email format")
+		private String newEmail;
+	}
 }
-	

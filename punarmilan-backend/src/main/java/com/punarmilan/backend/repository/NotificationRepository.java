@@ -17,38 +17,48 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
 
     // Find notifications for user, ordered by creation time
     Page<Notification> findByUserOrderByCreatedAtDesc(User user, Pageable pageable);
-    
+
     // Find unread notifications for user
     List<Notification> findByUserAndReadFalseOrderByCreatedAtDesc(User user);
-    
+
     // Count unread notifications
     long countByUserAndReadFalse(User user);
-    
+
     // Count unseen notifications
     long countByUserAndSeenFalse(User user);
-    
+
     // Mark all notifications as read for user
     @Modifying
     @Transactional
     @Query("UPDATE Notification n SET n.read = true WHERE n.user = :user AND n.read = false")
     int markAllAsRead(@Param("user") User user);
-    
+
     // Mark all notifications as seen for user
     @Modifying
     @Transactional
     @Query("UPDATE Notification n SET n.seen = true WHERE n.user = :user AND n.seen = false")
     int markAllAsSeen(@Param("user") User user);
-    
+
     // Delete old notifications
     @Modifying
     @Transactional
     @Query("DELETE FROM Notification n WHERE n.user = :user AND n.createdAt < :cutoffDate")
     int deleteOldNotifications(@Param("user") User user, @Param("cutoffDate") LocalDateTime cutoffDate);
-    
+
     // Find similar notifications (to avoid duplicates)
     @Query("SELECT n FROM Notification n WHERE n.user = :user AND n.type = :type " +
-           "AND n.relatedId = :relatedId ORDER BY n.createdAt DESC")
+            "AND n.relatedId = :relatedId ORDER BY n.createdAt DESC")
     List<Notification> findSimilarNotifications(@Param("user") User user,
-                                                @Param("type") Notification.NotificationType type,
-                                                @Param("relatedId") Long relatedId);
+            @Param("type") Notification.NotificationType type,
+            @Param("relatedId") Long relatedId);
+
+    // Count by user and type
+    long countByUserAndTypeAndReadFalse(User user, Notification.NotificationType type);
+
+    // List by user
+    List<Notification> findByUser(User user);
+
+    @Modifying
+    @Transactional
+    void deleteByUser(User user);
 }

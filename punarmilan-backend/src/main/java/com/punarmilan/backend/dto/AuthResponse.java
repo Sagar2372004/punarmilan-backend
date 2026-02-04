@@ -1,16 +1,17 @@
 package com.punarmilan.backend.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class AuthResponse {
-	
-	private String token;
-//	
-//    private String type;    // "Bearer" 
-//    private String email;   // user email
-//    private String roles;   // user role (USER/ADMIN)
-
+    private String token;
+    private String type = "Bearer";
+    private UserResponse user;
+    private String message;
 }

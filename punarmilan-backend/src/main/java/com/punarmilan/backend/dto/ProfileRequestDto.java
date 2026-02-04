@@ -40,11 +40,18 @@ public class ProfileRequestDto {
     private String college;
     private String occupation;
     private String company;
-    private String annualIncome;
+    private String workingWith;
+    private Double annualIncome;
     private String workingCity;
+    private String grewUpIn;
+    private String zipCode;
+    private String residencyStatus;
 
     // ================= LIFESTYLE =================
     private String diet;
+    private String bloodGroup;
+    private String healthInformation;
+    private String disability;
     private String drinkingHabit;
     private String smokingHabit;
 
@@ -54,9 +61,18 @@ public class ProfileRequestDto {
     private String city;
     private String address;
 
+    // ================= FAMILY =================
+    private String fatherStatus;
+    private String motherStatus;
+    private Integer brothersCount;
+    private Integer sistersCount;
+    private String familyFinancialStatus;
+    private String familyLocation;
+
     // ================= ABOUT =================
     private String aboutMe;
-    
+    private String hobbies;
+
     // ================= PHOTOS =================
     private String profilePhotoUrl;
     private String photoUrl2;
@@ -71,6 +87,18 @@ public class ProfileRequestDto {
     private String idProofNumber;
 
     // ================= SETTINGS =================
-    private String profileCreatedBy;    // Self / Parents
-    private String profileVisibility;   // Public / Private
+    private String profileCreatedBy; // Self / Parents
+    private String profileVisibility; // Public / Private
+    private String profilePhotoVisibility;
+    private String albumPhotoVisibility;
+    private String contactDisplayStatus;
+
+    // ================= ASTRO =================
+    @JsonFormat(pattern = "HH:mm")
+    private java.time.LocalTime timeOfBirth;
+    private String placeOfBirth;
+    private String manglikStatus;
+    private String nakshatra;
+    private String rashi;
+    private String astroVisibility;
 }

@@ -1,6 +1,5 @@
 package com.punarmilan.backend.dto;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,9 +12,28 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ErrorResponse {
-    private int status;
-    private String message;
-    
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime timestamp;
+    private int status;
+    private String error;
+    private String message;
+    private String path;
+    
+    public ErrorResponse(int status, String message, String path) {
+        this.timestamp = LocalDateTime.now();
+        this.status = status;
+        this.error = getErrorFromStatus(status);
+        this.message = message;
+        this.path = path;
+    }
+    
+    private String getErrorFromStatus(int status) {
+        switch (status) {
+            case 400: return "Bad Request";
+            case 401: return "Unauthorized";
+            case 403: return "Forbidden";
+            case 404: return "Not Found";
+            case 500: return "Internal Server Error";
+            default: return "Error";
+        }
+    }
 }
